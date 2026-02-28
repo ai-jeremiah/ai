@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jeremiah AI</title>
+
+<style>
+body {
+  margin: 0;
+  background: linear-gradient(135deg, #0f0f0f, #1a0033);
+  color: white;
+  font-family: -apple-system, Arial;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
+}
+
+h1 {
+  margin-top: 40px;
+  font-size: 2.5rem;
+  background: linear-gradient(90deg, #9d4edd, #00f5ff);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.chat-box {
+  width: 90%;
+  max-width: 600px;
+  height: 450px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 20px;
+  padding: 20px;
+  overflow-y: auto;
+  backdrop-filter: blur(10px);
+  box-shadow: 0 0 30px rgba(157,78,221,0.3);
+}
+
+.message {
+  margin: 10px 0;
+  padding: 12px;
+  border-radius: 12px;
+  word-wrap: break-word;
+}
+
+.user {
+  background: #9d4edd;
+  text-align: right;
+}
+
+.ai {
+  background: #222;
+  text-align: left;
+}
+
+.input-area {
+  margin: 20px;
+  width: 90%;
+  max-width: 600px;
+  display: flex;
+  gap: 10px;
+}
+
+input {
+  flex: 1;
+  padding: 15px;
+  border-radius: 12px;
+  border: none;
+  font-size: 16px;
+}
+
+button {
+  padding: 15px 20px;
+  border-radius: 12px;
+  border: none;
+  background: #00f5ff;
+  color: black;
+  font-weight: bold;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<h1>🤖 Jeremiah AI</h1>
+
+<div class="chat-box" id="chat"></div>
+
+<div class="input-area">
+  <input id="prompt" placeholder="Talk to Jeremiah..." />
+  <button onclick="sendMessage()">Send</button>
+</div>
+
+<script>
+const API_URL = "PASTE_YOUR_NGROK_LINK_HERE/generate";
+
+async function sendMessage() {
+  const input = document.getElementById("prompt");
+  const chat = document.getElementById("chat");
+  const text = input.value;
+
+  if (!text) return;
+
+  chat.innerHTML += `<div class="message user">${text}</div>`;
+  input.value = "";
+  chat.scrollTop = chat.scrollHeight;
+
+  const loading = document.createElement("div");
+  loading.className = "message ai";
+  loading.innerText = "Jeremiah is thinking...";
+  chat.appendChild(loading);
+
+  try {
+    const res = await fetch(API_URL, {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({ text: text })
+    });
+
+    const data = await res.json();
+    loading.remove();
+
+    chat.innerHTML += `<div class="message ai">${data.response}</div>`;
+    chat.scrollTop = chat.scrollHeight;
+
+  } catch (err) {
+    loading.innerText = "Error: Check ngrok + Colab is running.";
+  }
+}
+</script>
+
+</body>
+</html>
